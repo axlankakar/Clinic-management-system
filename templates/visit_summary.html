@@ -1,0 +1,62 @@
+{% extends 'dashboard_base.html' %}
+{% block page_title %}Visit Summary{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3 class="card-title">Visit Summary</h3>
+          <button class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+        </div>
+        <div class="text-center mb-4" style="border-bottom:2px solid #0d6efd; padding-bottom:10px;">
+          <h4 style="margin-bottom:0; color:#0d6efd;">{{ CLINIC_BRAND.doctor }}</h4>
+          <div style="font-size:1.1rem;">{{ CLINIC_BRAND.title }}</div>
+          <div style="font-size:1rem;">{{ CLINIC_BRAND.clinic }}</div>
+          <div style="font-size:1rem;">Phone: {{ CLINIC_BRAND.phone }}</div>
+        </div>
+        <h5 class="mt-4">Patient Information</h5>
+        <table class="table table-bordered mb-4">
+          <tr><th>Name</th><td>{{ visit.patient.name }}</td></tr>
+          <tr><th>Father's Name</th><td>{{ visit.patient.father_name }}</td></tr>
+          <tr><th>Age</th><td>{{ visit.patient.age }}</td></tr>
+          <tr><th>Sex</th><td>{{ visit.patient.sex }}</td></tr>
+          <tr><th>Contact</th><td>{{ visit.patient.contact }}</td></tr>
+        </table>
+        <h5>Visit Details</h5>
+        <table class="table table-bordered mb-4">
+          <tr><th>Date</th><td>{{ visit.date.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+          <tr><th>Symptoms</th><td>{{ visit.symptoms }}</td></tr>
+          <tr><th>Diagnosis</th><td>{{ visit.diagnosis.name }}</td></tr>
+        </table>
+        <h5>Prescriptions</h5>
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr><th>Medicine</th><th>Dosage</th><th>Duration</th></tr>
+          </thead>
+          <tbody>
+            {% for p in visit.prescriptions %}
+            <tr>
+              <td>{{ p.medication.name }}</td>
+              <td>{{ p.dosage }}</td>
+              <td>{{ p.duration }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="mt-5 text-end" style="font-size:1.1rem;">
+          <em>Signature: ___________________________</em>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+@media print {
+  body * { visibility: hidden; }
+  .card, .card * { visibility: visible; }
+  .btn, .navbar, .footer, .sidebar, .topbar { display: none !important; }
+  .card { position: absolute; left: 0; top: 0; width: 100vw; box-shadow: none; border: none; }
+}
+</style>
+{% endblock %} 
