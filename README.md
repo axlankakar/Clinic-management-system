@@ -22,7 +22,27 @@ A modern, professional, doctor-only clinic management web application built with
 - **Frontend:** Bootstrap 5, custom CSS, Jinja2 templates
 - **Forms:** WTForms
 
-## Setup Instructions
+## How to Run Locally (No Python Needed)
+
+You can run this app directly from a USB drive on any Windows computer—no installation or internet required!
+
+### Steps:
+1. **Plug in the USB drive.**
+2. **Open the `dist` folder** (provided to you, containing `app.exe`, `templates/`, `static/`, and `instance/` folders).
+3. **Double-click `app.exe`** to start the clinic management system.
+4. **Open your web browser** and go to [http://127.0.0.1:5000](http://127.0.0.1:5000)
+
+### Database Notes
+- All your clinic data is stored in the file: `instance/clinic.db` (on the USB drive).
+- **You do NOT need to do anything with the database.**
+- All changes (new patients, visits, etc.) are saved automatically to the USB drive.
+- If you move the USB to another computer, your data goes with it.
+
+### Default Doctor Credentials
+- **Username:** `doctor`
+- **Password:** `password`
+
+## (For Developers) Setup Instructions
 1. **Clone the repository**
 2. **Create and activate a virtual environment**
    ```bash
@@ -44,23 +64,13 @@ A modern, professional, doctor-only clinic management web application built with
 6. **Open in your browser:**
    - Go to [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
-## Default Doctor Credentials
-- **Username:** `doctor`
-- **Password:** `password`
-
 ## Database Structure
 - **Doctor**: id, username, password_hash
 - **Patient**: id, name, father_name, age, sex, contact
-- **Diagnosis**: id, name
+- **Diagnosis**: id, code, description
 - **Medication**: id, name
 - **Visit**: id, patient_id, doctor_id, diagnosis_id, symptoms, date
 - **Prescription**: id, visit_id, medication_id, dosage, duration
-
-## Demo Data
-- 1 doctor account (see credentials above)
-- 3 demo patients
-- 6 common psychiatric diagnoses
-- 6 example medications
 
 ## Usage Notes
 - **Add unlimited patients** via the "Register Patient" page.

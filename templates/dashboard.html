@@ -1,0 +1,38 @@
+{% extends 'dashboard_base.html' %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-body text-center">
+        <h5 class="card-title">Total Patient Visits</h5>
+        <div class="display-4 fw-bold">{{ total_visits }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Top Symptoms</h5>
+        <ol class="mb-0">
+          {% for symptom, count in top_symptoms %}
+            <li>{{ symptom }} <span class="badge bg-primary">{{ '%.1f' % (100*count/total_visits if total_visits else 0) }}%</span></li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Top ICD-10 Diagnoses</h5>
+        <ol class="mb-0">
+          {% for diag, count in top_diagnoses %}
+            <li>{{ diag.code }} - {{ diag.description }} <span class="badge bg-success">{{ '%.1f' % (100*count/total_visits if total_visits else 0) }}%</span></li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

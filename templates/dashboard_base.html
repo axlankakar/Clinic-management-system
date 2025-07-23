@@ -74,6 +74,7 @@
         {{ CLINIC_BRAND.doctor }}
     </div>
     <nav class="nav flex-column mt-3">
+        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Dashboard</a>
         <a class="nav-link {% if request.path.startswith('/patients') %}active{% endif %}" href="/patients">Patients</a>
         <a class="nav-link {% if request.path.startswith('/register_patient') %}active{% endif %}" href="/register_patient">Register Patient</a>
         <a class="nav-link {% if request.path.startswith('/new_visit') %}active{% endif %}" href="/new_visit">New Visit</a>

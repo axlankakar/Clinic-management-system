@@ -22,7 +22,7 @@
             <tr>
               <td>{{ v.date.strftime('%Y-%m-%d') }}</td>
               <td>{{ v.symptoms }}</td>
-              <td>{{ v.diagnosis.name }}</td>
+              <td>{{ v.diagnosis.code }} - {{ v.diagnosis.description }}</td>
               <td>
                 {% for p in v.prescriptions %}
                   <span class="badge bg-info">{{ p.medication.name }} ({{ p.dosage }}, {{ p.duration }})</span><br>
@@ -62,9 +62,10 @@
               {% for value, label in form.symptoms.choices %}
                 <div class="col-md-3 mb-1">
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="symptoms" id="symptom-{{ loop.index }}" value="{{ value }}" {% if form.symptoms.data and value in form.symptoms.data %}checked{% endif %} onchange="showOtherSymptom()">
+                    <input class="form-check-input" type="checkbox" name="symptoms" id="symptom-{{ loop.index }}" value="{{ value }}" {% if form.symptoms.data and value in form.symptoms.data %}checked{% endif %} onchange="showSymptomDuration(this, '{{ value }}')">
                     <label class="form-check-label" for="symptom-{{ loop.index }}">{{ label }}</label>
                   </div>
+                  <input type="text" class="form-control mt-1 symptom-duration" name="symptom_duration_{{ value }}" id="symptom-duration-{{ value }}" placeholder="Duration (e.g. 2 weeks)" style="display:none;" />
                 </div>
               {% endfor %}
             </div>
@@ -153,10 +154,24 @@ function showOtherSymptom() {
     otherDiv.style.display = 'none';
   }
 }
+function showSymptomDuration(checkbox, value) {
+  var input = document.getElementById('symptom-duration-' + value);
+  if (checkbox.checked) {
+    input.style.display = '';
+    input.required = true;
+  } else {
+    input.style.display = 'none';
+    input.required = false;
+    input.value = '';
+  }
+}
 // On page load, show/hide other fields if needed
 window.onload = function() {
   showOtherDiagnosis(document.querySelector('select[name="diagnosis_id"]'));
   showOtherSymptom();
+  document.querySelectorAll('input[name="symptoms"]:checked').forEach(function(cb) {
+    showSymptomDuration(cb, cb.value);
+  });
 };
 </script>
 {% endblock %} 

@@ -4,10 +4,26 @@ from flask_wtf import CSRFProtect
 from werkzeug.security import check_password_hash
 from functools import wraps
 import os
+import sys
+from collections import Counter
+
+def get_database_path():
+    if getattr(sys, 'frozen', False):
+        # Running as compiled exe
+        application_path = os.path.dirname(sys.executable)
+        instance_path = os.path.join(application_path, 'instance')
+    else:
+        # Running as script
+        instance_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance')
+    
+    # Create instance directory if it doesn't exist
+    os.makedirs(instance_path, exist_ok=True)
+    db_path = os.path.join(instance_path, 'clinic.db')
+    return f'sqlite:///{db_path}'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinic.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = get_database_path()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 from models import db, Doctor, Patient, Diagnosis, Medication, Visit, Prescription
@@ -15,6 +31,10 @@ from forms import LoginForm, PatientForm, VisitForm, PatientSearchForm
 
 db.init_app(app)
 csrf = CSRFProtect(app)
+
+with app.app_context():
+    if not os.path.exists(get_database_path().replace('sqlite:///', '')):
+        db.create_all()
 
 # Professional symptom and diagnosis lists
 SYMPTOM_LIST = [
@@ -24,29 +44,6 @@ SYMPTOM_LIST = [
     'Euphoria', 'Grandiosity', 'Hyperactivity', 'Self-harm', 'Substance abuse', 'Confusion', 'Mood swings',
     'Avoidance', 'Physical complaints', 'Disinhibition', 'Impulsivity', 'Guilt', 'Hopelessness', 'Anhedonia', 'Fear'
 ]
-
-DIAGNOSIS_LIST = [
-    'Major Depressive Disorder', 'Generalized Anxiety Disorder', 'Bipolar Disorder', 'Schizophrenia',
-    'Obsessive-Compulsive Disorder', 'Panic Disorder', 'Post-Traumatic Stress Disorder', 'Social Anxiety Disorder',
-    'Attention Deficit Hyperactivity Disorder', 'Autism Spectrum Disorder', 'Borderline Personality Disorder',
-    'Dissociative Identity Disorder', 'Somatic Symptom Disorder', 'Delusional Disorder', 'Acute Psychosis',
-    'Adjustment Disorder', 'Anorexia Nervosa', 'Bulimia Nervosa', 'Substance Use Disorder', 'Insomnia Disorder',
-    'Hypomania', 'Cyclothymia', 'Schizoaffective Disorder', 'Paranoid Personality Disorder', 'Avoidant Personality Disorder',
-    'Dependent Personality Disorder', 'Antisocial Personality Disorder', 'Histrionic Personality Disorder',
-    'Narcissistic Personality Disorder', 'Specific Phobia', 'Agoraphobia', 'Seasonal Affective Disorder', 'PTSD', 'Other'
-]
-
-# Example prescription suggestions for some diagnoses
-DIAGNOSIS_PRESCRIPTIONS = {
-    'Major Depressive Disorder': ['Sertraline', 'Fluoxetine', 'Escitalopram', 'Mirtazapine'],
-    'Generalized Anxiety Disorder': ['Escitalopram', 'Sertraline', 'Buspirone', 'Diazepam'],
-    'Bipolar Disorder': ['Lithium', 'Valproate', 'Olanzapine', 'Quetiapine'],
-    'Schizophrenia': ['Risperidone', 'Olanzapine', 'Haloperidol', 'Clozapine'],
-    'Obsessive-Compulsive Disorder': ['Fluoxetine', 'Sertraline', 'Clomipramine'],
-    'Panic Disorder': ['Paroxetine', 'Sertraline', 'Alprazolam'],
-    'Post-Traumatic Stress Disorder': ['Sertraline', 'Paroxetine', 'Venlafaxine'],
-    'Other': []
-}
 
 # Branding info
 CLINIC_BRAND = {
@@ -69,8 +66,25 @@ def inject_branding():
     return dict(CLINIC_BRAND=CLINIC_BRAND)
 
 @app.route('/', methods=['GET'])
-def home():
-    return redirect(url_for('patients'))
+def dashboard():
+    total_visits = Visit.query.count()
+    # Gather all symptoms (split by comma, strip, remove duration in parentheses)
+    all_symptoms = []
+    for v in Visit.query.all():
+        for s in v.symptoms.split(','):
+            s = s.strip()
+            if '(' in s:
+                s = s[:s.index('(')].strip()
+            all_symptoms.append(s)
+    top_symptoms = Counter(all_symptoms).most_common(5)
+    # Top ICD-10 diagnoses (by code)
+    all_diag_ids = [v.diagnosis_id for v in Visit.query.all() if v.diagnosis_id]
+    diag_counts = Counter(all_diag_ids)
+    top_diag_ids = [d[0] for d in diag_counts.most_common(5)]
+    top_diags = Diagnosis.query.filter(Diagnosis.id.in_(top_diag_ids)).all()
+    diag_map = {d.id: d for d in top_diags}
+    top_diagnoses = [(diag_map[did], diag_counts[did]) for did in top_diag_ids if did in diag_map]
+    return render_template('dashboard.html', total_visits=total_visits, top_symptoms=top_symptoms, top_diagnoses=top_diagnoses)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -155,10 +169,9 @@ def new_visit():
     form = VisitForm()
     form.patient_id.choices = [(p.id, p.name) for p in Patient.query.all()]
     form.symptoms.choices = [(s, s) for s in SYMPTOM_LIST] + [('Other', 'Other')]
-    form.diagnosis_id.choices = [(i+1, d) for i, d in enumerate(DIAGNOSIS_LIST)]
+    diagnoses = Diagnosis.query.all()
+    form.diagnosis_id.choices = [(d.id, f"{d.code} - {d.description}") for d in diagnoses] + [(0, 'Other')]
     medications = Medication.query.all()
-    diagnosis_name = None
-    suggested_prescriptions = []
     visit_history = []
     selected_patient = None
     if request.method == 'GET' and request.args.get('patient_id'):
@@ -169,22 +182,31 @@ def new_visit():
             visit_history = Visit.query.filter_by(patient_id=selected_patient.id).order_by(Visit.date.desc()).all()
     if form.validate_on_submit():
         selected_symptoms = form.symptoms.data
+        symptoms_with_duration = []
+        for s in selected_symptoms:
+            duration = request.form.get(f'symptom_duration_{s}', '').strip()
+            if duration:
+                symptoms_with_duration.append(f"{s} ({duration})")
+            else:
+                symptoms_with_duration.append(s)
         if 'Other' in selected_symptoms and form.other_symptom.data:
-            selected_symptoms = [s for s in selected_symptoms if s != 'Other'] + [form.other_symptom.data]
-        symptoms_str = ", ".join(selected_symptoms)
+            symptoms_with_duration = [s for s in symptoms_with_duration if not s.startswith('Other')] + [form.other_symptom.data]
+        symptoms_str = ", ".join(symptoms_with_duration)
         diagnosis_id = form.diagnosis_id.data
-        diagnosis_name = DIAGNOSIS_LIST[diagnosis_id-1] if diagnosis_id and diagnosis_id <= len(DIAGNOSIS_LIST) else None
-        if diagnosis_name == 'Other' and form.other_diagnosis.data:
-            diagnosis_name = form.other_diagnosis.data
-        diagnosis_obj = Diagnosis.query.filter_by(name=diagnosis_name).first()
-        if not diagnosis_obj:
-            diagnosis_obj = Diagnosis(name=diagnosis_name)
-            db.session.add(diagnosis_obj)
-            db.session.commit()
+        if diagnosis_id and diagnosis_id != 0:
+            diagnosis_obj = Diagnosis.query.get(diagnosis_id)
+        elif form.other_diagnosis.data:
+            diagnosis_obj = Diagnosis.query.filter_by(code='Other', description=form.other_diagnosis.data).first()
+            if not diagnosis_obj:
+                diagnosis_obj = Diagnosis(code='Other', description=form.other_diagnosis.data)
+                db.session.add(diagnosis_obj)
+                db.session.commit()
+        else:
+            diagnosis_obj = None
         visit = Visit(
             patient_id=form.patient_id.data,
             doctor_id=session['doctor_id'],
-            diagnosis_id=diagnosis_obj.id,
+            diagnosis_id=diagnosis_obj.id if diagnosis_obj else None,
             symptoms=symptoms_str
         )
         db.session.add(visit)
@@ -224,11 +246,8 @@ def new_visit():
         db.session.commit()
         flash('Visit recorded successfully.', 'success')
         return redirect(url_for('visit_summary', visit_id=visit.id))
-    if form.diagnosis_id.data:
-        diagnosis_name = DIAGNOSIS_LIST[form.diagnosis_id.data-1]
-        suggested_prescriptions = DIAGNOSIS_PRESCRIPTIONS.get(diagnosis_name, [])
     return render_template('new_visit.html', form=form, medications=[{'id': m.id, 'name': m.name} for m in medications],
-                           symptom_list=SYMPTOM_LIST, diagnosis_list=DIAGNOSIS_LIST, suggested_prescriptions=suggested_prescriptions,
+                           symptom_list=SYMPTOM_LIST, diagnosis_list=diagnoses,
                            visit_history=visit_history, selected_patient=selected_patient)
 
 @app.route('/visit/<int:visit_id>')
