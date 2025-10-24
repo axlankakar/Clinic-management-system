@@ -1,0 +1,127 @@
+===============================================
+   CLINIC MANAGEMENT SYSTEM - INSTALLATION GUIDE
+===============================================
+
+OPTION 1: SIMPLE START (Recommended for Non-Technical Users)
+-------------------------------------------------------------
+
+**PREREQUISITE: Python 3.11 or later must be installed**
+   Download from: https://www.python.org/downloads/
+   ⚠️ IMPORTANT: Check "Add Python to PATH" during installation!
+
+1. Extract this ZIP file to any location on your computer
+   (e.g., Desktop, Documents, or C:\ClinicSystem)
+
+2. Double-click "run_clinic.bat"
+
+3. FIRST TIME ONLY: It will automatically install required packages
+   (This takes 2-5 minutes - please wait!)
+
+4. A black window will open - DON'T CLOSE IT!
+
+5. Open Google Chrome or any web browser
+
+6. Type in the address bar: http://127.0.0.1:5000
+
+7. Login with:
+   Username: doctor
+   Password: password
+
+8. To STOP the system: Close the black window or press Ctrl+C
+
+
+OPTION 2: PYTHON INSTALLATION (If Option 1 doesn't work)
+---------------------------------------------------------
+
+If you see an error about "Python not found":
+
+1. Download Python from: https://www.python.org/downloads/
+   - Download Python 3.11 or later
+   - During installation, CHECK "Add Python to PATH"
+
+2. After Python is installed, restart your computer
+
+3. Open the extracted folder
+
+4. Double-click "run_clinic.bat" again
+
+
+OPTION 3: MANUAL START (For Technical Users)
+---------------------------------------------
+
+1. Open Command Prompt (cmd) or PowerShell
+
+2. Navigate to the extracted folder:
+   cd path\to\Clinic-management-system
+
+3. Activate virtual environment (if using):
+   venv\Scripts\activate
+
+4. Run the application:
+   python app.py
+
+5. Open browser: http://127.0.0.1:5000
+
+
+TROUBLESHOOTING
+---------------
+
+Problem: "Python is not recognized..."
+Solution: Install Python (see Option 2 above)
+
+Problem: Can't access http://127.0.0.1:5000
+Solution: 
+  - Check if the black window is still open
+  - Try: http://localhost:5000
+  - Check if port 5000 is blocked by firewall
+
+Problem: Database errors
+Solution: Delete the "instance" folder and run again
+
+Problem: Application crashes
+Solution: 
+  1. Make sure Python 3.11+ is installed
+  2. Run: pip install -r requirements.txt
+  3. Run: python seed.py
+  4. Run: python app.py
+
+
+DATA BACKUP
+-----------
+
+Your clinic data is stored in: instance\clinic.db
+
+IMPORTANT: Regularly backup this file!
+- Copy "instance\clinic.db" to a safe location
+- Or copy the entire folder to USB/Cloud
+
+
+SYSTEM REQUIREMENTS
+-------------------
+
+- Windows 10 or later
+- Python 3.11 or later (will be installed if needed)
+- 500 MB free disk space
+- Any modern web browser (Chrome, Edge, Firefox)
+- Internet connection (only for first-time setup to download dependencies)
+
+
+SUPPORT CONTACT
+---------------
+
+For technical support, contact: [Your Contact Information]
+
+
+DEFAULT LOGIN CREDENTIALS
+--------------------------
+
+Username: doctor
+Password: password
+
+IMPORTANT: Change the password after first login!
+
+
+===============================================
+   Enjoy using the Clinic Management System!
+===============================================
+

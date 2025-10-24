@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════
+       CLINIC MANAGEMENT SYSTEM
+       QUICK START GUIDE
+═══════════════════════════════════════════════
+
+⚠️ BEFORE YOU START:
+   Install Python 3.11+ from: https://www.python.org
+   ✓ Check "Add Python to PATH" during installation
+
+
+🚀 HOW TO START:
+
+1. Double-click: run_clinic.bat
+
+2. First time: Wait 2-5 minutes while it installs packages
+
+3. Wait for the black window to show the URL
+
+4. Open Google Chrome
+
+5. Go to: http://127.0.0.1:5000
+
+6. Login:
+   👤 Username: doctor
+   🔒 Password: password
+
+
+⚠️ IMPORTANT:
+   - DON'T CLOSE the black window while using the system
+   - Your data is saved in the "instance" folder
+   - Backup the "instance" folder regularly
+
+
+🔧 TROUBLESHOOTING:
+   - Error "Python not found"? → Install Python first
+   - Can't connect? → Make sure black window is open
+   - Still stuck? → Read INSTALLATION_GUIDE.txt
+
+
+📞 NEED HELP?
+   Read: INSTALLATION_GUIDE.txt
+
+
+═══════════════════════════════════════════════
+

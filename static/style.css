@@ -1,0 +1,122 @@
+body {
+    background: #f7f7fa;
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    color: #232946;
+    min-height: 100vh;
+}
+
+.navbar, .footer, .sidebar {
+    background: #232946;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(24, 28, 36, 0.08);
+}
+
+.navbar-brand, .clinic-header {
+    letter-spacing: 1px;
+    font-size: 1.3rem;
+}
+
+.card {
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 24px 0 rgba(24, 28, 36, 0.08), 0 1.5px 4px 0 rgba(0,0,0,0.03);
+    border: 1px solid #e0e0e0;
+    transition: box-shadow 0.3s, border 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 32px 0 rgba(24, 28, 36, 0.12), 0 2px 8px 0 rgba(0,0,0,0.06);
+    border: 1.5px solid #b6b6e5;
+}
+
+.card-title {
+    font-weight: 700;
+    color: #232946;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary, .btn-success, .btn-outline-secondary {
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    background: #232946;
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 8px 0 rgba(24, 28, 36, 0.10);
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover, .btn-success:hover, .btn-outline-secondary:hover {
+    filter: brightness(1.08);
+    color: #fff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 4px 16px 0 #23294633;
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    color: #232946;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    border-color: #e0e0e0;
+}
+
+input.form-control, select.form-select, textarea.form-control {
+    border-radius: 8px;
+    border: 1.5px solid #b6b6e5;
+    background: #f7f7fa;
+    color: #232946;
+    box-shadow: none;
+    transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+    outline: none;
+    position: relative;
+}
+
+input.form-control:focus, select.form-select:focus, textarea.form-control:focus {
+    border-color: #232946;
+    box-shadow: 0 0 0 2px #b6b6e555;
+    background: #fff;
+    color: #232946;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #232946;
+    margin-bottom: 0.2rem;
+}
+
+.alert {
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #f1f1f7;
+    color: #232946;
+    border: none;
+}
+
+.badge.bg-info {
+    background: #e0e0e0;
+    color: #232946;
+    font-weight: 500;
+    font-size: 1rem;
+    box-shadow: none;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    background: #f7f7fa;
+}
+::-webkit-scrollbar-thumb {
+    background: #b6b6e5;
+    border-radius: 8px;
+}
+
+@media (max-width: 600px) {
+    .card { border-radius: 8px; }
+    .container { margin-top: 18px; }
+} 
